@@ -1,0 +1,24 @@
+package ie.gmit.sw;
+
+public class FileDialogBox {
+	private String filePath;
+	
+	public FileDialogBox() {
+		super();
+	}
+	
+	public String readFilePath() {
+		FileDialog dialog = new FileDialog(new Frame(), "Choose a File To Encrypt Or Decrypt...(Path To Choose File)",
+				FileDialog.LOAD);
+		dialog.setVisible(true);
+		String fileName = dialog.getFile();
+		String path = dialog.getDirectory();
+		if (path == null) {
+			System.out.println("No Path Chosen...!!!\nProgram is terminated");
+			System.exit(0);
+		} else {
+			filePath = path + fileName;
+		}
+		return filePath;
+	}
+}

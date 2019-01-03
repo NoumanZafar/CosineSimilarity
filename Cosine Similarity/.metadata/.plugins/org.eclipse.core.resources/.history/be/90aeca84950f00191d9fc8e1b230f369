@@ -1,0 +1,65 @@
+package ie.gmit.sw;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
+
+/**
+ * This class implements the Callable interface and call the call() method which
+ * returns null value. This class reads the file in chunks (Number of
+ * characters) and add them to the BlockingQueue
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ * @see Callable
+ */
+public class FileParser implements Callable<Object> {
+	private String fileName;
+	private BlockingQueue<Shingle> queue;
+	private int k_mer_size;
+
+	/**
+	 * Constructor takes the BlockingQueue,File name and k-mer size.
+	 * 
+	 * @param queue      - BlockingQueue to add the k-mer
+	 * @param fileName   - Name (Path) of the file to read
+	 * @param k_mer_size - Number of the characters needs to read from file at a
+	 *                   time. This might effect the results and the time of
+	 *                   execution of the program.
+	 */
+	public FileParser(BlockingQueue<Shingle> queue, String fileName, int k_mer_size) {
+		super();
+		this.queue = queue;
+		this.fileName = fileName;
+		this.k_mer_size = k_mer_size;
+	}
+
+	public Object call() throws Exception {
+		try {
+			Reader reader = new InputStreamReader(new FileInputStream(fileName), StandardCharsets.UTF_8);
+			char[] chars = new char[k_mer_size];
+			int charRead = -1;
+			while ((charRead = readChars(reader, chars)) != -1) {
+				if (charRead != k_mer_size) {
+					int add = charRead % k_mer_size;
+					int run = k_mer_size - add;
+					for (int i = 0; i < run; i++) {
+						chars[add + i] = ' ';
+					}
+				}
+				String shingle = new String(chars).replaceAll("[^A-Za-z0-9 ]", "");
+				queue.put(new Shingle(this.fileName, shingle));
+			}
+			queue.put(new Poison(fileName, "END-OF-FILE"));
+			reader.close();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public int readChars(Reader reader, char[] chars) throws IOException {
+		return reader.read(chars);
+	}
+}

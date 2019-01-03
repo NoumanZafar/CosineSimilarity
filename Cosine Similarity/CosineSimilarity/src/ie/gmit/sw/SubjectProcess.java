@@ -11,31 +11,42 @@ public class SubjectProcess {
 	private int maxFiles;
 	private BlockingQueue<ConcurrentHashMap<String, Integer>> mapQueue;
 	private List<String> filesList;
-	private int charLength;
+	private int k_mer_size;
 
-	public SubjectProcess(List<String> filesList,int charLength,int maxFiles) {
+	public SubjectProcess(List<String> filesList, int k_mer_size, int maxFiles) {
 		super();
 		this.filesList = filesList;
-		this.charLength=charLength;
-		this.maxFiles=maxFiles;
+		this.k_mer_size = k_mer_size;
+		this.maxFiles = maxFiles;
 	}
 
-	public BlockingQueue<ConcurrentHashMap<String, Integer>> readSubjectFolder(String folderName, int queueSize, int poolSize)
-			throws InterruptedException, ExecutionException {
+	public BlockingQueue<ConcurrentHashMap<String, Integer>> readSubjectFolder(String folderName, int queueSize,
+			int poolSize) throws InterruptedException, ExecutionException {
 		mapQueue = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(maxFiles);
 		filesList = new ArrayList<String>();
 		queue = new ArrayBlockingQueue<>(queueSize);
 		pool = Executors.newFixedThreadPool(poolSize);
 		File folder = new File(folderName);
-		String[] files = folder.list();
-		fileCount = files.length;
-		Future<BlockingQueue<ConcurrentHashMap<String, Integer>>> list = pool.submit(new SubjectShingleTaker(queue, fileCount,maxFiles));
-		for (String file : files) {
-			pool.submit(new FileParser(queue, folderName + "/" + file,charLength));
-			filesList.add(file);
+		if (folder.isDirectory()) {
+			String[] files = folder.list();
+			fileCount = files.length;
+			Future<BlockingQueue<ConcurrentHashMap<String, Integer>>> list = pool
+					.submit(new SubjectShingleTaker(queue, fileCount, maxFiles));
+			for (String file : files) {
+				pool.submit(new FileParser(queue, folderName + "/" + file, k_mer_size));
+				filesList.add(file);
+				Thread.sleep(10);
+			}
+			this.mapQueue = list.get();
+		} else {
+			fileCount = 1;
+			Future<BlockingQueue<ConcurrentHashMap<String, Integer>>> list = pool
+					.submit(new SubjectShingleTaker(queue, fileCount, maxFiles));
 			Thread.sleep(10);
+			pool.submit(new FileParser(queue, folderName, k_mer_size));
+			Thread.sleep(10);
+			this.mapQueue = list.get();
 		}
-		this.mapQueue = list.get();
 		pool.shutdown();
 		return mapQueue;
 	}

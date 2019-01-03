@@ -1,0 +1,62 @@
+package ie.gmit.sw;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class Results {
+	private Scanner console;
+	private List<String> filesList;
+	private ExecutorService pool;
+	private SubjectProcess subjectFileProcess;
+	private ConcurrentHashMap<String, Integer> queryMap;
+	private BlockingQueue<ConcurrentHashMap<String, Integer>> subjectMapsList;
+	private int k_mer_size = 15;
+	private int queueSize = 20;
+	private int poolSize = Runtime.getRuntime().availableProcessors();
+	private int MAX_FILES = 20;
+
+	public Results() {
+		super();
+		console = new Scanner(System.in);
+		filesList = new ArrayList<String>();
+		pool = Executors.newFixedThreadPool(poolSize);
+		queryMap = new ConcurrentHashMap<String, Integer>();
+		subjectFileProcess = new SubjectProcess(filesList, k_mer_size, MAX_FILES);
+		subjectMapsList = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(MAX_FILES);
+	}
+
+	public void go() {
+		int i = 0;
+		try {
+			System.out.print("Enter Query File or URL --> ");
+			String file = console.nextLine();
+
+			System.out.print("Enter Subject Directory --> ");
+			String dir = console.nextLine();
+
+			long startTime = System.currentTimeMillis();
+			System.out.println("\n\nProcessing....Please wait....!!!");
+			queryMap = new QueryProcess(k_mer_size).queryFileRead(file, queueSize, poolSize);
+			subjectMapsList = subjectFileProcess.readSubjectFolder(dir, queueSize, 2);
+			filesList = subjectFileProcess.getList();
+
+			for (ConcurrentHashMap<String, Integer> map : subjectMapsList) {
+				Future<Double> future = pool.submit(new SimilarityCalculation(queryMap, map));
+				Double result = future.get();
+				if (filesList.size() > 0) {
+					System.out.println("Cosine Similarity with [" + filesList.get(i++) + "] is : "
+							+ String.format("%.2f", result) + " %");
+				} else {
+					System.out.println(
+							"Cosine Similarity with [" + dir + "] is : " + String.format("%.2f", result) + " %");
+				}
+			}
+
+			System.out.println("\n\nTotal Run Time ------> "
+					+ (double) ((System.currentTimeMillis() - startTime) * 0.001) + " sec.");
+			pool.shutdown();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+}

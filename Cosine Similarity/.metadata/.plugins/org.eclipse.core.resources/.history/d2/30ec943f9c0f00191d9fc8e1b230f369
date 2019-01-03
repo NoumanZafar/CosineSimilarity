@@ -1,0 +1,50 @@
+package ie.gmit.sw;
+
+import java.util.concurrent.*;
+
+/**
+ * This class implements Callable interface which return
+ * ConcurrentHashMap<String,Integer>. This class takes the BlockingQueue and and
+ * generate ConcurrentHashMap<String,Integer>.
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ * @see Callable
+ */
+public class QueryShingleTaker implements Callable<ConcurrentHashMap<String, Integer>> {
+	private BlockingQueue<Shingle> queue;
+	private ConcurrentHashMap<String, Integer> queryMap;
+	private boolean keepAlive = true;
+	private Shingle shingleInstance;
+
+	/**
+	 * 
+	 * @param queue BlockingQueue of type Shingle.
+	 */
+	public QueryShingleTaker(BlockingQueue<Shingle> queue) {
+		super();
+		this.queue = queue;
+	}
+
+	/**
+	 * This method returns ConcurrentHashMap<String,Integer>
+	 */
+	public ConcurrentHashMap<String, Integer> call() throws Exception {
+		queryMap = new ConcurrentHashMap<>();
+		while (keepAlive) {
+			shingleInstance = queue.take();
+			/**
+			 * If the shingle (k-mer) is instance of the Poison class then exit the loop. which means end of file.
+			 */
+			if (shingleInstance instanceof Poison) {
+				break;
+			}
+			String shingle = shingleInstance.getShingle();
+			Integer frequency = queryMap.get(shingle);
+			frequency = (frequency == null) ? 1 : ++frequency;
+			queryMap.put(shingle, frequency);
+		}
+		return queryMap;
+	}
+}

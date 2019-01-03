@@ -26,17 +26,17 @@ public class SimilarityCalculation implements Callable<Double> {
 		for (String word : unique) {
 			dotProduct += queryMap.get(word) * subjectMap.get(word);
 		}
-		System.out.println("\n\nDot product : " + dotProduct);
+		//System.out.println("\n\nDot product : " + dotProduct);
 
 		for (String i : queryMap.keySet()) {
 			queryMagnitude += Math.pow(queryMap.get(i), 2);
 		}
-		System.out.println("Query Map Magnitude : " + Math.sqrt(queryMagnitude));
+		//System.out.println("Query Map Magnitude : " + Math.sqrt(queryMagnitude));
 
 		for (String i : subjectMap.keySet()) {
 			subjectMagnitude += Math.pow(subjectMap.get(i), 2);
 		}
-		System.out.println("Subject Map Magnitude : " + Math.sqrt(subjectMagnitude));
+		//System.out.println("Subject Map Magnitude : " + Math.sqrt(subjectMagnitude));
 
 		return (dotProduct / (Math.sqrt(queryMagnitude) * Math.sqrt(subjectMagnitude))) * 100;
 	}

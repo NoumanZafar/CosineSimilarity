@@ -10,7 +10,7 @@ public class Results {
 	private SubjectProcess subjectFileProcess;
 	private ConcurrentHashMap<String, Integer> queryMap;
 	private BlockingQueue<ConcurrentHashMap<String, Integer>> subjectMapsList;
-	private int charLength = 10;
+	private int k_mer_size = 15;
 	private int queueSize = 20;
 	private int poolSize = Runtime.getRuntime().availableProcessors();
 	private int MAX_FILES = 20;
@@ -21,7 +21,7 @@ public class Results {
 		filesList = new ArrayList<String>();
 		pool = Executors.newFixedThreadPool(poolSize);
 		queryMap = new ConcurrentHashMap<String, Integer>();
-		subjectFileProcess = new SubjectProcess(filesList, charLength, MAX_FILES);
+		subjectFileProcess = new SubjectProcess(filesList, k_mer_size, MAX_FILES);
 		subjectMapsList = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(MAX_FILES);
 	}
 
@@ -36,17 +36,24 @@ public class Results {
 
 			long startTime = System.currentTimeMillis();
 			System.out.println("\n\nProcessing....Please wait....!!!");
-			queryMap = new QueryProcess(charLength).queryFileRead(file, queueSize, poolSize);
+			queryMap = new QueryProcess(k_mer_size).queryFileRead(file, queueSize, poolSize);
 			subjectMapsList = subjectFileProcess.readSubjectFolder(dir, queueSize, 2);
 			filesList = subjectFileProcess.getList();
-
+			
+			System.out.println("\n-----------------------------------------------------------------------");
 			for (ConcurrentHashMap<String, Integer> map : subjectMapsList) {
 				Future<Double> future = pool.submit(new SimilarityCalculation(queryMap, map));
 				Double result = future.get();
-				System.out.println("Cosine Similarity with [" + filesList.get(i++) + "] is : "
-						+ String.format("%.2f", result) + " %");
+				if (filesList.size() > 0) {
+					System.out.println("Cosine Similarity with [" + filesList.get(i++) + "] is : "
+							+ String.format("%.2f", result) + " %");
+				} else {
+					System.out.println(
+							"Cosine Similarity with [" + dir + "] is : " + String.format("%.2f", result) + " %");
+				}
 			}
-			System.out.println("\n\nTotal Run Time ------> "
+			System.out.println("-----------------------------------------------------------------------");
+			System.out.println("\nTotal Run Time ------> "
 					+ (double) ((System.currentTimeMillis() - startTime) * 0.001) + " sec.");
 			pool.shutdown();
 		} catch (InterruptedException | ExecutionException e) {

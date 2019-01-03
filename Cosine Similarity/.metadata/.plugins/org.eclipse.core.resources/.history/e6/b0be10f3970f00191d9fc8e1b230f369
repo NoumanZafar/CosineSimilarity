@@ -1,0 +1,23 @@
+package ie.gmit.sw;
+
+/**
+ * This class Extends the Shingle class. This class is used to poison the
+ * BlockingQueue which helps finding out the end of file or stream.
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ * @see Shingle
+ */
+public class Poison extends Shingle {
+
+	/**
+	 * Constructor takes the file name and shingle call them from Shingle class.
+	 * 
+	 * @param file    - Name of the file which needs to be read.
+	 * @param shingle - String or word or combination of characters depends upon the k_mer_size in @see FileParser
+	 */
+	public Poison(String file, String shingle) {
+		super(file, shingle);
+	}
+}
