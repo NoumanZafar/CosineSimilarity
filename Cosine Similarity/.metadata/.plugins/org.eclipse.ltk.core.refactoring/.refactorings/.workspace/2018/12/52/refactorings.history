@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Cosine_Similarity&apos;" deleteContents="true" description="Delete resource &apos;Cosine_Similarity&apos;" element1="/Cosine_Similarity" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1546095469316"/>
+</session>

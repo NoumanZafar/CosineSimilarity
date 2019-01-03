@@ -1,0 +1,37 @@
+package ie.gmit.sw;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class SubjectShingleTaker implements Callable<BlockingQueue<ConcurrentHashMap<String, Integer>>> {
+	private BlockingQueue<Shingle> queue;
+	private int fileCount;
+	private boolean keepRunning = true;
+	private ConcurrentHashMap<String, Integer> subjectMap;
+	private BlockingQueue<ConcurrentHashMap<String, Integer>> list;
+
+	public SubjectShingleTaker(BlockingQueue<Shingle> queue, int fileCount) {
+		super();
+		this.queue = queue;
+		this.fileCount = fileCount;
+		subjectMap = new ConcurrentHashMap<String, Integer>();
+		list = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(10);
+	}
+
+	public BlockingQueue<ConcurrentHashMap<String, Integer>> call() throws Exception {
+		while (fileCount > 0 && keepRunning) {
+			Shingle w = queue.take();
+			if (w instanceof Poison) {
+				list.put(subjectMap);
+				subjectMap = new ConcurrentHashMap<String, Integer>();
+				fileCount--;
+			} else {
+				String shingle = w.getShingle();
+				Integer frequency = subjectMap.get(shingle);
+				frequency = (frequency == null) ? 1 : ++frequency;
+				subjectMap.put(shingle, frequency);
+			}
+		}
+		return list;
+	}
+}

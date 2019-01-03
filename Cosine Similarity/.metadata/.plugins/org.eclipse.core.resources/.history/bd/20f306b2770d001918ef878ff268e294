@@ -1,0 +1,30 @@
+package ie.gmit.sw;
+
+import java.util.concurrent.*;
+
+public class QueryShingleTaker implements Callable<ConcurrentHashMap<char[], Integer>> {
+	private BlockingQueue<Shingle> queue;
+	private ConcurrentHashMap<char[], Integer> queryMap;
+	private boolean keepAlive = true;
+	private Shingle shingleInstance;
+
+	public QueryShingleTaker(BlockingQueue<Shingle> queue) {
+		super();
+		this.queue = queue;
+	}
+
+	public ConcurrentHashMap<char[], Integer> call() throws Exception {
+		queryMap = new ConcurrentHashMap<>();
+		while (keepAlive) {
+			shingleInstance = queue.take();
+			if (shingleInstance instanceof Poison) {
+				break;
+			}
+			char[] shingle = shingleInstance.getShingle();
+			Integer frequency = queryMap.get(shingle);
+			frequency = (frequency == null) ? 1 : ++frequency;
+			queryMap.put(shingle, frequency);
+		}
+		return queryMap;
+	}
+}

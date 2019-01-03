@@ -1,0 +1,51 @@
+package ie.gmit.sw;
+
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class CosineSimilarity implements Callable<Double>{
+	private ConcurrentHashMap<String, Integer> queryMap;
+	private ConcurrentHashMap<String, Integer> subjectMap;
+	
+	public CosineSimilarity(ConcurrentHashMap<String, Integer> queryMap,
+			ConcurrentHashMap<String, Integer> subjectMap) {
+		super();
+		this.queryMap = queryMap;
+		this.subjectMap = subjectMap;
+	}
+
+
+
+	public double cosineSimilarity() {
+		Set<String> unique = new HashSet<>(queryMap.keySet());
+		unique.retainAll(subjectMap.keySet());
+
+		double dotProduct = 0, queryMagnitude = 0, subjectMagnitude = 0;
+
+		for (String word : unique) {
+			dotProduct += queryMap.get(word) * subjectMap.get(word);
+		}
+		System.out.println("\n\nDot product : " + dotProduct);
+
+		for (String i : queryMap.keySet()) {
+			queryMagnitude += Math.pow(queryMap.get(i), 2);
+		}
+		System.out.println("Query Map Magnitude : " + Math.sqrt(queryMagnitude));
+
+		for (String i : subjectMap.keySet()) {
+			subjectMagnitude += Math.pow(subjectMap.get(i), 2);
+		}
+		System.out.println("Subject Map Magnitude : " + Math.sqrt(subjectMagnitude));
+
+		return (dotProduct / (Math.sqrt(queryMagnitude) * Math.sqrt(subjectMagnitude))) * 100;
+	}
+
+
+
+	@Override
+	public Double call() throws Exception {
+		
+		return null;
+	}
+}

@@ -1,0 +1,44 @@
+package ie.gmit.sw;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.*;
+
+public class SubjectProcess {
+	private BlockingQueue<Shingle> queue;
+	private ExecutorService pool;
+	private int fileCount;
+	private BlockingQueue<ConcurrentHashMap<String, Integer>> mapList;
+	private List<String> filesList;
+	private int charLength;
+
+	public SubjectProcess(List<String> filesList,int charLength) {
+		super();
+		this.filesList = filesList;
+		this.charLength=charLength;
+	}
+
+	public List<ConcurrentHashMap<String, Integer>> readSubjectFolder(String folderName, int queueSize, int poolSize)
+			throws InterruptedException, ExecutionException {
+		mapList = new ArrayList<ConcurrentHashMap<String, Integer>>();
+		filesList = new ArrayList<String>();
+		queue = new ArrayBlockingQueue<>(queueSize);
+		pool = Executors.newFixedThreadPool(poolSize);
+		File folder = new File(folderName);
+		String[] files = folder.list();
+		fileCount = files.length;
+		Future<List<ConcurrentHashMap<String, Integer>>> list = pool.submit(new SubjectShingleTaker(queue, fileCount));
+		for (String file : files) {
+			pool.submit(new FileParser(queue, folderName + "/" + file,charLength));
+			filesList.add(file);
+			Thread.sleep(10);
+		}
+		this.mapList = list.get();
+		pool.shutdown();
+		return mapList;
+	}
+
+	public List<String> getList() {
+		return filesList;
+	}
+}

@@ -1,0 +1,18 @@
+	/*public Object call() throws Exception {
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] words = line.split(" ");
+				for (String s : words) {
+					s = s.toUpperCase().replaceAll("[^A-Za-z0-9 ]", "");
+					queue.put(new Shingle(this.fileName, s));
+				}
+			}
+			queue.put(new Poison(fileName, "END-OF-FILE"));
+			br.close();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}*/

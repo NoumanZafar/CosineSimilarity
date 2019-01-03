@@ -1,0 +1,8 @@
+package ie.gmit.sw;
+
+public class Poison extends Shingle {
+
+	public Poison(String file, char[] shingle) {
+		super(file, shingle);
+	}
+}

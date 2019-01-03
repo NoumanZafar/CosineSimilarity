@@ -1,0 +1,33 @@
+package ie.gmit.sw;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class QueryProcess {
+	private BlockingQueue<Shingle> queue;
+	private ExecutorService pool;
+	private ConcurrentHashMap<String, Integer> queryMap = new ConcurrentHashMap<String, Integer>();
+
+	public QueryProcess() {
+		super();
+	}
+
+	public ConcurrentHashMap<String, Integer> queryFileRead(String fileName) throws InterruptedException, ExecutionException {
+		queue = new ArrayBlockingQueue<Shingle>(1);
+		pool = Executors.newFixedThreadPool(2);
+		Future<ConcurrentHashMap<String, Integer>> map = pool.submit(new QueryShingleTaker(queue));
+		Thread.sleep(10);
+		pool.submit(new QueryFileParser(queue, fileName));
+		Thread.sleep(10);
+		this.queryMap = map.get();
+		System.out.println("Map from process class : " + this.queryMap);
+		pool.shutdown();
+		System.out.println("Shutdown....");
+		return queryMap;
+	}
+}

@@ -1,0 +1,28 @@
+package ie.gmit.sw;
+
+public class Shingle {
+	private String file;
+	private char[] shingle;
+
+	public Shingle(String file, char[] shingle) {
+		super();
+		this.file = file;
+		this.shingle = shingle;
+	}
+
+	public String getFile() {
+		return file;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
+	}
+
+	public char[] getShingle() {
+		return shingle;
+	}
+
+	public void setShingle(char[] shingle) {
+		this.shingle = shingle;
+	}
+}

@@ -1,0 +1,38 @@
+package ie.gmit.sw;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class QueryProcess {
+	private BlockingQueue<Shingle> queue;
+	private ExecutorService pool;
+
+	public QueryProcess() {
+		super();
+	}
+
+	public void queryFileRead(String fileName) {
+		queue = new ArrayBlockingQueue<Shingle>(1);
+		pool = Executors.newFixedThreadPool(2);
+		QueryShingleTaker taker=new QueryShingleTaker(queue);
+		
+		pool.submit(taker);
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		pool.submit(new QueryFileParser(queue, fileName));
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		pool.shutdown();
+		System.out.println("Shutdown....");
+		taker.getMap();
+	}
+}
