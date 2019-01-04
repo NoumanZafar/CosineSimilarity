@@ -22,11 +22,11 @@ public class FileParser implements Callable<Object> {
 	/**
 	 * Constructor takes the BlockingQueue,File name and k-mer size.
 	 * 
-	 * @param queue      - BlockingQueue to add the k-mer
-	 * @param fileName   - Name (Path) of the file to read
-	 * @param k_mer_size - Number of the characters needs to read from file at a
-	 *                   time. This may effect the results and the time of execution
-	 *                   of the program.
+	 * @param queue      BlockingQueue to add the k-mer
+	 * @param fileName   Name (Path) of the file to read
+	 * @param k_mer_size Number of the characters needs to read from file at a time.
+	 *                   This may effect the results and the time of execution of
+	 *                   the program.
 	 */
 	public FileParser(BlockingQueue<Shingle> queue, String fileName, int k_mer_size) {
 		super();
@@ -85,11 +85,11 @@ public class FileParser implements Callable<Object> {
 	 * Reads the number of characters and return the buffer (Number of characters
 	 * being read) size.
 	 * 
-	 * @param reader - Used to read the file it gives the advantage of using the
+	 * @param reader Used to read the file it gives the advantage of using the
 	 *               Encoding characters e.g UTF-8
-	 * @param chars  - Characters array
-	 * @return - Number of characters being read
-	 * @throws IOException - Input/Output Exception.
+	 * @param chars  Characters array
+	 * @return Number of characters being read
+	 * @throws IOException Input/Output Exception.
 	 */
 	public int readCharacters(Reader reader, char[] chars) throws IOException {
 		return reader.read(chars);

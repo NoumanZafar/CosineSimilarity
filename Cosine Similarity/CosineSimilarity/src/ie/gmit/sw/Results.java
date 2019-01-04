@@ -3,18 +3,65 @@ package ie.gmit.sw;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * This class takes the user input for the files (Query files and Subject
+ * files). and then call the different classes to parse the file and generate
+ * the ConcurrenHashMap and the out of that map calculate the Cosine-Similarity
+ * and display the result in percentage e.g CosineSimilarity with [Filename] is
+ * : 100.00%
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ *
+ */
 public class Results {
+
+	/**
+	 * To take user input from console.
+	 */
 	private Scanner console;
+
+	/**
+	 * List holds the name of all the files in a folder.
+	 */
 	private List<String> filesList;
 	private ExecutorService pool;
+
+	/**
+	 * Composition with the {@link SubjectProcess} class
+	 */
 	private SubjectProcess subjectFileProcess;
 	private ConcurrentHashMap<String, Integer> queryMap;
 	private BlockingQueue<ConcurrentHashMap<String, Integer>> subjectMapsList;
+
+	/**
+	 * Number of character needs to be read during the file reading. This may effect
+	 * the performance of the program as well as on the results. e.g If the size is
+	 * bigger then it will be fast enough to read the file and process and vice
+	 * versa.
+	 */
 	private int k_mer_size = 15;
+
+	/**
+	 * Capacity of the BlockingQueue.
+	 */
 	private int queueSize = 20;
+
+	/**
+	 * Number of threads available in the JVM.
+	 */
 	private int poolSize = Runtime.getRuntime().availableProcessors();
+
+	/**
+	 * Maximum number of files in the folder that SubjectProcess class processes.
+	 */
 	private int MAX_FILES = 20;
 
+	/**
+	 * Instantiates the different objects e.g Scanner, BlockingQueue,
+	 * ConcurrentHashMap, ExecutorService etc.
+	 */
 	public Results() {
 		super();
 		console = new Scanner(System.in);
@@ -25,6 +72,9 @@ public class Results {
 		subjectMapsList = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(MAX_FILES);
 	}
 
+	/**
+	 * Provides the results.
+	 */
 	public void go() {
 		int i = 0;
 		try {
@@ -36,25 +86,51 @@ public class Results {
 
 			long startTime = System.currentTimeMillis();
 			System.out.println("\n\nProcessing....Please wait....!!!");
+
+			/**
+			 * queryMap is a ConcurrentHashMap<String, Integer>. which is assigned the value
+			 * return by method queryFileRead(file, queueSize, poolSize); from QueryProcess
+			 * class.
+			 */
 			queryMap = new QueryProcess(k_mer_size).queryFileRead(file, queueSize, poolSize);
+
+			/**
+			 * subjectMapsList is a BlockingQueue<ConcurentHashMap<String,Integer>> which is
+			 * assigned the value returned by method readSubjectFolder(folderName,
+			 * queueSize, poolSize) from SubjectProcess class.
+			 */
 			subjectMapsList = subjectFileProcess.readSubjectFolder(dir, queueSize, 2);
+
+			/**
+			 * Names of all files in the folder.
+			 */
 			filesList = subjectFileProcess.getList();
-			
+
 			System.out.println("\n-----------------------------------------------------------------------");
 			for (ConcurrentHashMap<String, Integer> map : subjectMapsList) {
 				Future<Double> future = pool.submit(new SimilarityCalculation(queryMap, map));
 				Double result = future.get();
+
+				/**
+				 * If similarity between File and Folder (Folder can have multiple files).
+				 */
 				if (filesList.size() > 0) {
 					System.out.println("Cosine Similarity with [" + filesList.get(i++) + "] is : "
 							+ String.format("%.2f", result) + " %");
 				} else {
+					/**
+					 * If similarity is calculated between only two files.
+					 */
 					System.out.println(
 							"Cosine Similarity with [" + dir + "] is : " + String.format("%.2f", result) + " %");
 				}
 			}
 			System.out.println("-----------------------------------------------------------------------");
-			System.out.println("\nTotal Run Time ------> "
-					+ (double) ((System.currentTimeMillis() - startTime) * 0.001) + " sec.");
+			System.out.println("\nTotal Run Time ------> " + (double) ((System.currentTimeMillis() - startTime) * 0.001)
+					+ " sec.");
+			/**
+			 * Stop the threads.
+			 */
 			pool.shutdown();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();

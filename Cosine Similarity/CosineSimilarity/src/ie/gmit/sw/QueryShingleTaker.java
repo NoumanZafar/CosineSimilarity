@@ -3,14 +3,13 @@ package ie.gmit.sw;
 import java.util.concurrent.*;
 
 /**
- * This class implements Callable interface which return
- * ConcurrentHashMap<String,Integer>. This class takes the BlockingQueue and and
- * generate ConcurrentHashMap<String,Integer>.
+ * This class implements Callable interface which return ConcurrentHashMap. This
+ * class takes the BlockingQueue and and generate ConcurrentHashMap.
  * 
  * @author Nouman Zafar
  * @version 1.0
  * @since 1.8
- * @see Callable,ConcurrentHashMap
+ * @see ConcurrentHashMap
  */
 public class QueryShingleTaker implements Callable<ConcurrentHashMap<String, Integer>> {
 	private BlockingQueue<Shingle> queue;
@@ -28,7 +27,7 @@ public class QueryShingleTaker implements Callable<ConcurrentHashMap<String, Int
 	}
 
 	/**
-	 * This method returns ConcurrentHashMap<String,Integer>
+	 * This method returns ConcurrentHashMap
 	 */
 	public ConcurrentHashMap<String, Integer> call() throws Exception {
 		queryMap = new ConcurrentHashMap<>();

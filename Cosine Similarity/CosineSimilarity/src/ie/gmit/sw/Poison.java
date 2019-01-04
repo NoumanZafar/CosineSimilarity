@@ -14,8 +14,8 @@ public class Poison extends Shingle {
 	/**
 	 * Constructor takes the file name and shingle call them from Shingle class.
 	 * 
-	 * @param file    - Name of the file which needs to be read.
-	 * @param shingle - String or word or combination of characters depends upon the
+	 * @param file    Name of the file which needs to be read.
+	 * @param shingle String or word or combination of characters depends upon the
 	 *                k_mer_size in {@link FileParser}
 	 */
 	public Poison(String file, String shingle) {

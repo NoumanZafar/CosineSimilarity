@@ -1,9 +1,23 @@
 package ie.gmit.sw;
 
+/**
+ * This class is used to store the Shingles (k-mer) from different files. Each
+ * shingle or k-mer is the instance of this class. And this class generates the
+ * getters and setters from the Shingle attributes.
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ *
+ */
 public class Shingle {
 	private String file;
 	private String shingle;
-	
+
+	/**
+	 * 
+	 * @param file    Name of the file
+	 * @param shingle Each string word or the char array read from the file.
+	 */
 	public Shingle(String file, String shingle) {
 		super();
 		this.file = file;

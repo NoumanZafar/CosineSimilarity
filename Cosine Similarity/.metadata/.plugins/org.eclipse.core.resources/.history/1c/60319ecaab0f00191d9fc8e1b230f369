@@ -1,0 +1,48 @@
+package ie.gmit.sw;
+
+import java.util.concurrent.*;
+
+/**
+ * This class is responsible for processing the data in the BlockingQueue and
+ * the calculate teh frequency of teh shingles and generate the ConcurentHashMap
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ *
+ */
+public class SubjectShingleTaker implements Callable<BlockingQueue<ConcurrentHashMap<String, Integer>>> {
+	private BlockingQueue<Shingle> queue;
+	private int fileCount;
+	private int maxFiles;
+	private boolean keepRunning = true;
+	private ConcurrentHashMap<String, Integer> subjectMap;
+	private BlockingQueue<ConcurrentHashMap<String, Integer>> mapQueue;
+
+	public SubjectShingleTaker(BlockingQueue<Shingle> queue, int fileCount, int maxFiles) {
+		super();
+		this.queue = queue;
+		this.fileCount = fileCount;
+		this.maxFiles = maxFiles;
+	}
+
+	public BlockingQueue<ConcurrentHashMap<String, Integer>> call() throws Exception {
+		subjectMap = new ConcurrentHashMap<String, Integer>();
+		mapQueue = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(maxFiles);
+
+		while (fileCount > 0 && keepRunning) {
+			Shingle w = queue.take();
+			if (w instanceof Poison) {
+				mapQueue.put(subjectMap);
+				subjectMap = new ConcurrentHashMap<String, Integer>();
+				fileCount--;
+			} else {
+				String shingle = w.getShingle();
+				Integer frequency = subjectMap.get(shingle);
+				frequency = (frequency == null) ? 1 : ++frequency;
+				subjectMap.put(shingle, frequency);
+			}
+		}
+		return mapQueue;
+	}
+}

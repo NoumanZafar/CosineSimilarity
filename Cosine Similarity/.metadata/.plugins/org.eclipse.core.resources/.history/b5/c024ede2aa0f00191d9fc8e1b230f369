@@ -1,0 +1,97 @@
+package ie.gmit.sw;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.*;
+
+/**
+ * This class uses ExecutorService where ThreadPool is created. Multiple threads
+ * runs the {@link FileParser} to read the file. And another ThreadPool submit
+ * {@link SubjectShingleTaker}. Where the results of that ThreadPool are
+ * assigned to Future interface to generate the ConcurrentHashMap<K,V>. All the
+ * maps added to the BlockingQueue.
+ * 
+ * @author Nouman Zafar
+ * @version 1.0
+ * @since 1.8
+ * @see ExecutorService,Future,ConcurrentHashMap,BlockingQueue
+ *
+ */
+public class SubjectProcess {
+	private BlockingQueue<Shingle> queue;
+	private ExecutorService pool;
+	private int fileCount;
+	private int maxFiles;
+	/**
+	 * Queue of ConcurrentHashMap<String , Integer>
+	 */
+	private BlockingQueue<ConcurrentHashMap<String, Integer>> mapQueue;
+
+	/**
+	 * All file names in the folder.
+	 */
+	private List<String> filesList;
+	private int k_mer_size;
+
+	/**
+	 * 
+	 * @param filesList  - File names in the folder.
+	 * @param k_mer_size - Number of characters needs to be read from the file.
+	 * @param maxFiles   - Max number of files in the Subject folder.
+	 */
+	public SubjectProcess(List<String> filesList, int k_mer_size, int maxFiles) {
+		super();
+		this.filesList = filesList;
+		this.k_mer_size = k_mer_size;
+		this.maxFiles = maxFiles;
+	}
+
+	/**
+	 * This method runs the ExecuterService to create the Thread pool which submit
+	 * the FileParser and SubjectShingleTaker classes which returns the
+	 * ConcurrentHashMaps these maps are assigned to the Future interface where
+	 * values can be retrieved by calling it's method get().
+	 * 
+	 * @param folderName - Name of the Subject folder which holds the multiple files
+	 *                   in it.
+	 * @param queueSize  -
+	 * @param poolSize
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	public BlockingQueue<ConcurrentHashMap<String, Integer>> readSubjectFolder(String folderName, int queueSize,
+			int poolSize) throws InterruptedException, ExecutionException {
+		mapQueue = new ArrayBlockingQueue<ConcurrentHashMap<String, Integer>>(maxFiles);
+		filesList = new ArrayList<String>();
+		queue = new ArrayBlockingQueue<>(queueSize);
+		pool = Executors.newFixedThreadPool(poolSize);
+		File folder = new File(folderName);
+		if (folder.isDirectory()) {
+			String[] files = folder.list();
+			fileCount = files.length;
+			Future<BlockingQueue<ConcurrentHashMap<String, Integer>>> list = pool
+					.submit(new SubjectShingleTaker(queue, fileCount, maxFiles));
+			for (String file : files) {
+				pool.submit(new FileParser(queue, folderName + "/" + file, k_mer_size));
+				filesList.add(file);
+				Thread.sleep(10);
+			}
+			this.mapQueue = list.get();
+		} else {
+			fileCount = 1;
+			Future<BlockingQueue<ConcurrentHashMap<String, Integer>>> list = pool
+					.submit(new SubjectShingleTaker(queue, fileCount, maxFiles));
+			Thread.sleep(10);
+			pool.submit(new FileParser(queue, folderName, k_mer_size));
+			Thread.sleep(10);
+			this.mapQueue = list.get();
+		}
+		pool.shutdown();
+		return mapQueue;
+	}
+
+	public List<String> getList() {
+		return filesList;
+	}
+}

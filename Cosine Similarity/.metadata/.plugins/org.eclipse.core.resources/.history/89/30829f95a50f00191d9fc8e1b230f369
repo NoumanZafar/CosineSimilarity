@@ -1,0 +1,35 @@
+package ie.gmit.sw;
+
+/**
+ * This class is used to store the Shingles (k-mer) from different files. Each
+ * shingle or k-mer is the instance of this class.
+ * 
+ * @author Nouman
+ *
+ */
+public class Shingle {
+	private String file;
+	private String shingle;
+
+	public Shingle(String file, String shingle) {
+		super();
+		this.file = file;
+		this.shingle = shingle;
+	}
+
+	public String getFile() {
+		return file;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
+	}
+
+	public String getShingle() {
+		return shingle;
+	}
+
+	public void setShingle(String shingle) {
+		this.shingle = shingle;
+	}
+}

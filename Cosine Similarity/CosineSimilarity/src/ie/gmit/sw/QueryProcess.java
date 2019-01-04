@@ -6,12 +6,12 @@ import java.util.concurrent.*;
  * This class uses ExecutorService where ThreadPool is created. Multiple threads
  * runs the {@link FileParser} to read the file. And another ThreadPool submit
  * {@link QueryShingleTaker}. Where the results of that ThreadPool are assigned
- * to Future interface to generate the ConcurrentHashMap<K,V>.
+ * to Future interface to generate the ConcurrentHashMap.
  * 
  * @author Nouman Zafar
  * @version 1.0
  * @since 1.8
- * @see ExecutorService,Future,ConcurrentHashMap
+ * @see ExecutorService
  *
  */
 public class QueryProcess {
@@ -31,16 +31,16 @@ public class QueryProcess {
 
 	/**
 	 * This method runs multiple threads to get BlockingQueue populated in the
-	 * FileParser class and generates the ConcurrentHashMap<K,V> with the help of
-	 * Future interface.
+	 * FileParser class and generates the ConcurrentHashMap with the help of Future
+	 * interface.
 	 * 
-	 * @param fileName  - Name of the file
-	 * @param queueSize - Size of the BlockingQueue. (Maximum capacity)
-	 * @param poolSize  - Size of the ThreadPool
-	 * @return - ConcurrentHashMap <String,Integer> where String is the Shingle and
-	 *         the Integer is the number of appearance of that Shingle in the file.
-	 * @throws InterruptedException
-	 * @throws ExecutionException
+	 * @param fileName  Name of the file
+	 * @param queueSize Size of the BlockingQueue. (Maximum capacity)
+	 * @param poolSize  Size of the ThreadPool
+	 * @return ConcurrentHashMap where String is the Shingle and the Integer is the
+	 *         number of appearance of that Shingle in the file.
+	 * @throws InterruptedException - Exception if Interrupted
+	 * @throws ExecutionException   Exception during execution
 	 */
 	public ConcurrentHashMap<String, Integer> queryFileRead(String fileName, int queueSize, int poolSize)
 			throws InterruptedException, ExecutionException {
