@@ -8,7 +8,7 @@ import java.util.concurrent.*;
  * files). and then call the different classes to parse the file and generate
  * the ConcurrenHashMap and the out of that map calculate the Cosine-Similarity
  * and display the result in percentage e.g CosineSimilarity with [Filename] is
- * : 100.00%
+ * : 23.41%
  * 
  * @author Nouman Zafar
  * @version 1.0
@@ -84,7 +84,6 @@ public class Results {
 			System.out.print("Enter Subject Directory --> ");
 			String dir = console.nextLine();
 
-			long startTime = System.currentTimeMillis();
 			System.out.println("\n\nProcessing....Please wait....!!!");
 
 			/**
@@ -106,7 +105,7 @@ public class Results {
 			 */
 			filesList = subjectFileProcess.getList();
 
-			System.out.println("\n-----------------------------------------------------------------------");
+			System.out.println("\n--------------------------------------------------------");
 			for (ConcurrentHashMap<String, Integer> map : subjectMapsList) {
 				Future<Double> future = pool.submit(new SimilarityCalculation(queryMap, map));
 				Double result = future.get();
@@ -125,9 +124,7 @@ public class Results {
 							"Cosine Similarity with [" + dir + "] is : " + String.format("%.2f", result) + " %");
 				}
 			}
-			System.out.println("-----------------------------------------------------------------------");
-			System.out.println("\nTotal Run Time ------> " + (double) ((System.currentTimeMillis() - startTime) * 0.001)
-					+ " sec.");
+			System.out.println("--------------------------------------------------------");
 			/**
 			 * Stop the threads.
 			 */

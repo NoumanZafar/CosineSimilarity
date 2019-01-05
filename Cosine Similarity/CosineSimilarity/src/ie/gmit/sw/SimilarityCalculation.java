@@ -42,7 +42,7 @@ public class SimilarityCalculation implements Callable<Double> {
 
 		/**
 		 * Loop over set of unique shingles and calculate the Dot Product dotProduct =
-		 * (Sum of word frequency in query map) X (Sum of word frequency in subject map)
+		 * (Sum of shingle frequency in query map) X (Sum of shingle frequency in subject map)
 		 */
 		for (String word : unique) {
 			dotProduct += queryMap.get(word) * subjectMap.get(word);
@@ -50,7 +50,7 @@ public class SimilarityCalculation implements Callable<Double> {
 
 		/**
 		 * Loop over all the Values from Query map and calculate the Magnitude of Query
-		 * map. magnitude = Sum of all values with the power of 2
+		 * map. magnitude = Sum of number of keys with the power of 2
 		 */
 		for (String i : queryMap.keySet()) {
 			queryMagnitude += Math.pow(queryMap.get(i), 2);
@@ -58,7 +58,7 @@ public class SimilarityCalculation implements Callable<Double> {
 
 		/**
 		 * Loop over all the Values from Subject map and calculate the Magnitude of
-		 * Subject map. magnitude = Sum of all values with the power of 2
+		 * Subject map. magnitude = Sum of number of keys with the power of 2
 		 */
 		for (String i : subjectMap.keySet()) {
 			subjectMagnitude += Math.pow(subjectMap.get(i), 2);
