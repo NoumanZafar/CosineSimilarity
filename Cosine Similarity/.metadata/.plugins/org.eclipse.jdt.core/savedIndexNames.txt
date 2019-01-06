@@ -3,7 +3,6 @@ INDEX VERSION 1.131+C:\Users\Nouman\Downloads\3rd Year\OOP\Project\Cosine Simila
 2327184759.index
 2857209468.index
 1607282252.index
-815114417.index
 2994552673.index
 1110334383.index
 3173990942.index

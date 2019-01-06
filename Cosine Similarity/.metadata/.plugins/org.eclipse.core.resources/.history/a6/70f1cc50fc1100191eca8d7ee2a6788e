@@ -49,7 +49,7 @@ public class Results {
 	private int queueSize = 20;
 
 	/**
-	 * Number of threads available in the JVM. In my computer is 4.
+	 * Number of threads available in the JVM.
 	 */
 	private int poolSize = Runtime.getRuntime().availableProcessors();
 
